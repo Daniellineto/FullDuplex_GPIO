@@ -1,4 +1,4 @@
-# SBGP - Simple Bit-Banging Protocol (Full-Duplex)
+# Lab – GPIO e NVIC STM32 (Full-Duplex protocol)
 
 Este projeto apresenta o desenvolvimento de um protocolo de comunicação digital do zero, utilizando as placas **STM32F446RE**. O objetivo é permitir a troca confiável de blocos de dados (arrays de 100 inteiros) utilizando apenas pinos de GPIO genéricos e interrupções externas, simulando um cenário onde periféricos dedicados (UART, SPI, I2C) não estão disponíveis.
 
@@ -44,8 +44,7 @@ O foco principal deste protocolo é a **Robustez**. Em ambientes com ruído mode
 ## Estrutura do Repositório
 
 * `/Core/Src/main.c`: Código-fonte principal com lógica de interrupção e bit-banging comentada.
-* `/Docs`: Diagramas e especificações detalhadas.
-* `/Video`: Link para o vídeo demonstrativo (ou arquivo mp4).
+* `Video`: [Link para o vídeo demonstrativo](https://youtu.be/P--iqrDlGXQ)
 
 ---
 **Desenvolvido por Daniel Lima Neto** *IFPB - Engenharia de Computação*
