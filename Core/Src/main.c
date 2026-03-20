@@ -50,10 +50,10 @@ volatile uint8_t byte_recebido = 0;
 // Conta quantos bits já chegaram (de 0 a 7)
 volatile uint8_t contador_bits = 0;
 
-// Flag que avisa o Main: "Chegou um número novo!"
+// Sinaliza para o main que um novo byte foi montado
 volatile uint8_t mensagem_pronta = 0;
 
-// Flag que avisa o Main: "A outra placa confirmou o recebimento (ACK)!"
+// Flag de confirmacao de handshake (recebeu 0xAA)
 volatile uint8_t ack_recebido = 0;
 
 /* USER CODE END PV */
@@ -94,7 +94,7 @@ void Transmitir_Byte_Sincrono(uint8_t dado) {
 void Delay_e_Escuta(uint32_t tempo_ms) {
 	uint32_t inicio = HAL_GetTick();
 
-	// Substitui o HAL_Delay comum para manter a placa "atenta"
+	// Delay nao-bloqueante baseado no SysTick
 	while((HAL_GetTick() - inicio) < tempo_ms) {
 
 		// Se a interrupção avisar que chegou um dado, imprime no console
@@ -158,12 +158,12 @@ int main(void)
 		  ack_recebido = 0; // Limpa a flag para esperar a confirmação deste novo dado
 		  Transmitir_Byte_Sincrono(valor_para_enviar);
 
-		  // ESPERA ATIVA PELO ACK (Aperto de mão): Aguarda até 1 segundo
+		  // Timeout de 1000ms aguardando o ACK
 		  uint32_t tempo_inicio = HAL_GetTick();
 
 		  while(ack_recebido == 0 && (HAL_GetTick() - tempo_inicio) < 1000) {
 
-			  // Se a outra placa enviar um número enquanto eu espero o ACK, eu processo aqui
+			  // Processa recebimentos concorrentes para nao travar o full-duplex
 			  if(mensagem_pronta == 1) {
 				  uint8_t valor_final = byte_recebido & 0x7F; // Remove máscara para exibir 0-100
 				  printf(" [->] Recebido da outra placa: %d\r\n", valor_final);
@@ -369,7 +369,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         contador_bits++;
 
         if(contador_bits >= 8) {
-            // SEPARAÇÃO: É dado ou é Handshake?
+        	// Verifica se o byte eh o sinal de ACK ou um dado de telemetria
             if (byte_recebido == 0xAA) {
                 ack_recebido = 1; // Recebeu o "HandShake"
             } else {
